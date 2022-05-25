@@ -29,5 +29,12 @@ install(
 # Install headers
 install(DIRECTORY include/${PROJECT_NAME}/ DESTINATION include/${PROJECT_NAME})
 
+# Unit tests
+if(${PLUGIN_LOADER_ENABLE_TESTING})
+  enable_testing()
+  add_run_tests_target(ENABLE ${PLUGIN_LOADER_ENABLE_RUN_TESTING})
+  add_subdirectory(test)
+endif()
+
 # Package configuration
 configure_package(NAMESPACE ${PROJECT_NAME})
