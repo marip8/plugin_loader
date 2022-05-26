@@ -42,35 +42,6 @@ std::vector<std::string> getAllAvailableClasses(const std::vector<boost::dll::fs
   return classes;
 }
 
-bool isClassAvailable(const std::string& symbol_name, const std::string& library_name,
-                      const std::string& library_directory = "")
-{
-  boost::system::error_code ec;
-  boost::dll::shared_library lib;
-  if (library_directory.empty())
-  {
-    boost::filesystem::path sl(library_name);
-    boost::dll::load_mode::type mode =
-        boost::dll::load_mode::append_decorations | boost::dll::load_mode::search_system_folders;
-    lib = boost::dll::shared_library(sl, ec, mode);
-  }
-  else
-  {
-    boost::filesystem::path sl = boost::filesystem::path(library_directory) / library_name;
-    lib = boost::dll::shared_library(sl, ec, boost::dll::load_mode::append_decorations);
-  }
-
-  // Check if it failed to find or load library
-  if (ec)
-  {
-    std::cerr << "Failed to find or load library: " << decorate(library_name, library_directory).c_str()
-              << " with error: " << ec.message();
-    return false;
-  }
-
-  return lib.has(symbol_name);
-}
-
 std::set<std::string> parseEnvironmentVariableList(const std::string& env_variable)
 {
   std::set<std::string> list;
@@ -170,8 +141,14 @@ boost::shared_ptr<PluginBase> PluginLoader::createInstanceBoost(const std::strin
   {
     for (const auto& library : plugins_local)
     {
-      if (isClassAvailable(plugin_name, library, path))
+      try
+      {
         return s_createSharedInstance<PluginBase>(plugin_name, library, path);
+      }
+      catch (const std::exception&)
+      {
+        continue;
+      }
     }
   }
 
@@ -180,8 +157,14 @@ boost::shared_ptr<PluginBase> PluginLoader::createInstanceBoost(const std::strin
   {
     for (const auto& library : search_libraries)
     {
-      if (isClassAvailable(plugin_name, library))
+      try
+      {
         return s_createSharedInstance<PluginBase>(plugin_name, library);
+      }
+      catch (const std::exception&)
+      {
+        continue;
+      }
     }
   }
 
