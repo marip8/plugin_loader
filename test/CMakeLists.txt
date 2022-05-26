@@ -4,13 +4,13 @@ find_gtest()
 add_library(${PROJECT_NAME}_plugin SHARED plugin.cpp)
 target_link_libraries(${PROJECT_NAME}_plugin PUBLIC ${PROJECT_NAME})
 target_cxx_version(${PROJECT_NAME}_plugin PUBLIC VERSION 17)
-target_clang_tidy(${PROJECT_NAME}_plugin ENABLE ${PLUGIN_LOADER_ENABLE_CLANG_TIDY})
+target_clang_tidy(${PROJECT_NAME}_plugin ENABLE ${ENABLE_CLANG_TIDY})
 
 # Test Implementation Library
 add_library(${PROJECT_NAME}_plugin_impl SHARED plugin_impl.cpp)
 target_link_libraries(${PROJECT_NAME}_plugin_impl PUBLIC ${PROJECT_NAME}_plugin)
 target_cxx_version(${PROJECT_NAME}_plugin_impl PUBLIC VERSION 17)
-target_clang_tidy(${PROJECT_NAME}_plugin_impl ENABLE ${PLUGIN_LOADER_ENABLE_CLANG_TIDY})
+target_clang_tidy(${PROJECT_NAME}_plugin_impl ENABLE ${ENABLE_CLANG_TIDY})
 
 # Unit test
 add_executable(${PROJECT_NAME}_utest utest.cpp)

@@ -7,6 +7,10 @@ project(${pkg_extracted_name} VERSION ${pkg_extracted_version} LANGUAGES CXX)
 
 find_package(Boost REQUIRED COMPONENTS filesystem)
 
+option(ENABLE_CLANG_TIDY "Enables compilation with clang-tidy" OFF)
+option(BUILD_TESTING "Enables compilation of unit tests" OFF)
+option(ENABLE_RUN_TESTING "Enables running of unit tests as a part of the build" OFF)
+
 add_library(${PROJECT_NAME} INTERFACE)
 target_include_directories(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                                                      "$<INSTALL_INTERFACE:include>")
