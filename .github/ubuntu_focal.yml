@@ -3,52 +3,37 @@ name: Ubuntu-Focal
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
   schedule:
     - cron: '0 5 * * *'
 
 jobs:
-  industrial_ci:
+  ci:
     name: Ubuntu-Focal
     runs-on: ubuntu-latest
-    env:
-      CI_NAME: Ubuntu-Focal
-      OS_NAME: ubuntu
-      OS_CODE_NAME: focal
-      ROS_DISTRO: noetic
-      ROS_REPO: main
-      ADDITIONAL_DEBS: 'clang-tidy'
-      UPSTREAM_WORKSPACE: 'dependencies.rosinstall'
-      ROSDEP_SKIP_KEYS: "iwyu ros_industrial_cmake_boilerplate"
-      CCACHE_DIR: "/home/runner/work/plugin_loader/plugin_loader/Ubuntu-Focal/.ccache"
-      BEFORE_RUN_TARGET_TEST_EMBED: "ici_with_unset_variables source /root/target_ws/install/setup.bash"
-      TARGET_CMAKE_ARGS: "-DCMAKE_BUILD_TYPE=Debug -DPLUGIN_LOADER_ENABLE_TESTING=ON -DPLUGIN_LOADER_ENABLE_CLANG_TIDY=ON"
     steps:
+      - name: Prepare workspace
+        run: |
+          mkdir src
+
       - uses: actions/checkout@v1
-
-      - name: Free Disk Space
-        run: |
-          sudo swapoff -a
-          sudo rm -f /swapfile
-          sudo apt clean
-          docker rmi $(docker image ls -aq)
-          df -h
-
-      - name: Prepare ccache timestamp
-        id: ccache_cache_timestamp
-        shell: cmake -P {0}
-        run: |
-          string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
-          message("::set-output name=timestamp::${current_date}")
-
-      - name: ccache cache files
-        uses: actions/cache@v1.1.0
         with:
-          path: ${{ env.CI_NAME }}/.ccache
-          key: ${{ env.CI_NAME }}-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
-          restore-keys: |
-            ${{ env.CI_NAME }}-ccache-
+          path: src
 
-      - uses: 'ros-industrial/industrial_ci@master'
-        env: ${{env}}
+      - name: Install dependencies
+        run: |
+          apt update && apt upgrade
+          apt install -q clang-tidy python3-vcstool python3-colcon-common-extensions python3-rosdep
+          rosdep init
+          rosdep update
+          vcs import --input "${{ github.workspace }}/src/${{ github.event.repository.name }}/dependencies.repos" src
+          rosdep install --from-paths src --ignore-src -r -y
+
+      - name: Build
+        run: |
+          colcon build --cmake-args -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DENABLE_CLANG_TIDY=ON
+
+      - name: Test
+        run: |
+          colcon test
