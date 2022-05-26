@@ -34,6 +34,8 @@ TYPED_TEST(PluginLoaderFixture, LoadPlugins)
     ASSERT_NO_THROW(plugin = this->loader.template createInstance<TypeParam>(plugin_name));
     ASSERT_NO_THROW(plugin->operator()());
   }
+
+  ASSERT_THROW(this->loader.template createInstance<TypeParam>(""), plugin_loader::PluginLoaderException);
 }
 
 int main(int argc, char** argv)
