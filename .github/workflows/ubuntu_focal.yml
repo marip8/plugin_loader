@@ -12,28 +12,39 @@ jobs:
   ci:
     name: Ubuntu-Focal
     runs-on: ubuntu-latest
+    env:
+      PROJECT_DIR: src/${{ github.event.repository.name }}
     steps:
       - name: Prepare workspace
+        working-directory: ..
         run: |
-          mkdir src
+          mkdir -p ${{ env.PROJECT_DIR }}
 
       - uses: actions/checkout@v1
         with:
-          path: src
+          path: ${{ env.PROJECT_DIR }}
 
       - name: Install dependencies
+        working-directory: ../..
         run: |
-          apt update && apt upgrade
-          apt install -q clang-tidy python3-vcstool python3-colcon-common-extensions python3-rosdep
-          rosdep init
-          rosdep update
-          vcs import --input "${{ github.workspace }}/src/${{ github.event.repository.name }}/dependencies.repos" src
-          rosdep install --from-paths src --ignore-src -r -y
+          pwd
+          ls
+          sudo apt update -q
+          sudo apt install -q -y clang-tidy python3 python3-pip
+          sudo pip3 install -q --upgrade pip
+          sudo pip3 install -q colcon-common-extensions rosdep vcstool
+          sudo rosdep init -q
+          rosdep update -q
+          vcs import src < src/${{ github.event.repository.name }}/dependencies.repos
+          rosdep install --from-paths src --ignore-src -r -y -q
 
       - name: Build
+        working-directory: ../..
         run: |
           colcon build --cmake-args -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DENABLE_CLANG_TIDY=ON
 
       - name: Test
+        working-directory: ../..
         run: |
           colcon test
+          colcon test-result
