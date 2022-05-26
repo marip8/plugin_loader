@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>plugin_loader</name>
+  <version>0.1.0</version>
+  <description>Plugin loader</description>
+
+  <author email="michael.ripperger@swri.org">Michael Ripperger</author>
+  <maintainer email="michael.ripperger@swri.org">Michael Ripperger</maintainer>
+
+  <license>Apache 2.0</license>
+
+  <build_depend>ros_industrial_cmake_boilerplate</build_depend>
+  <build_depend>boost</build_depend>
+
+  <export>
+    <build_type>cmake</build_type>
+  </export>
+</package>
