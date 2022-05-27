@@ -67,7 +67,7 @@ std::set<std::string> parseEnvironmentVariableList(const std::string& env_variab
     return list;
 
   std::string evn_str = std::string(env_var);
-  boost::split(list, evn_str, boost::is_any_of(";"), boost::token_compress_on);
+  boost::split(list, evn_str, boost::is_any_of(":"), boost::token_compress_on);
   return list;
 }
 
