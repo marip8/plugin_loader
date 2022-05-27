@@ -14,11 +14,7 @@ option(ENABLE_RUN_TESTING "Enables running of unit tests as a part of the build"
 add_library(${PROJECT_NAME} INTERFACE)
 target_include_directories(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                                                      "$<INSTALL_INTERFACE:include>")
-target_link_libraries(
-  ${PROJECT_NAME}
-  INTERFACE Boost::boost
-            Boost::filesystem
-            ${CMAKE_DL_LIBS})
+target_link_libraries(${PROJECT_NAME} INTERFACE Boost::boost Boost::filesystem ${CMAKE_DL_LIBS})
 target_cxx_version(${PROJECT_NAME} INTERFACE VERSION 17)
 target_clang_tidy(${PROJECT_NAME} ENABLE ${ENABLE_CLANG_TIDY})
 
