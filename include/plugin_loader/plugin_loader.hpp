@@ -221,19 +221,36 @@ std::vector<std::string> PluginLoader::getAllAvailablePlugins() const
 
   std::set<std::string> search_paths_local = getAllSearchPaths(search_paths_env, search_paths);
   if (search_paths_local.empty())
-    throw PluginLoaderException("No plugin search paths were provided!");
+  {
+    if (!search_system_folders)
+    {
+      throw PluginLoaderException("No plugin search paths were provided!");
+    }
+    else
+    {
+      // Insert an empty string into the search paths set to look in system folders
+      search_paths_local.insert(std::string{});
+    }
+  }
 
   std::vector<std::string> plugins;
   for (const std::string& library_directory : search_paths_local)
   {
     for (const std::string& library_name : library_names)
     {
-      boost::dll::shared_library lib = loadLibrary(library_name, library_directory);
-      boost::dll::library_info inf(lib.location());
+      try
+      {
+        boost::dll::shared_library lib = loadLibrary(library_name, library_directory);
+        boost::dll::library_info inf(lib.location());
 
-      // Getting symbols exported from plugin section
-      std::vector<std::string> exports = inf.symbols(PluginBase::section);
-      plugins.insert(plugins.end(), exports.begin(), exports.end());
+        // Getting symbols exported from plugin section
+        std::vector<std::string> exports = inf.symbols(PluginBase::section);
+        plugins.insert(plugins.end(), exports.begin(), exports.end());
+      }
+      catch (const std::exception&)
+      {
+        continue;
+      }
     }
   }
 
