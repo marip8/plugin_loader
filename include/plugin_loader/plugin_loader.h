@@ -57,12 +57,15 @@ public:
    */
   std::set<std::string> search_libraries;
 
-  /** @brief The environment variable containing plugin search paths */
+  /**
+   * @brief The environment variable containing plugin search paths
+   * @details The environment variables should be separated by a colon (":")
+   */
   std::string search_paths_env;
 
   /**
    * @brief The environment variable containing plugins
-   * @details The plugins are stored in the following format: "library_name;library_name1;library_name2"
+   * @details The libraries names stored within the environment variable should be separated by a colon (":")
    */
   std::string search_libraries_env;
 
