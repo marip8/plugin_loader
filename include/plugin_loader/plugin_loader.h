@@ -22,6 +22,11 @@
 #include <set>
 #include <boost/shared_ptr.hpp>
 
+/** @brief Macro for explicitly template instantiating a plugin loader for a given base class */
+#define INSTANTIATE_PLUGIN_LOADER(PluginBase)                                                                          \
+  template std::vector<std::string> plugin_loader::PluginLoader::getAllAvailablePlugins<PluginBase>() const;           \
+  template std::shared_ptr<PluginBase> plugin_loader::PluginLoader::createInstance(const std::string&) const;
+
 namespace plugin_loader
 {
 /**
