@@ -29,4 +29,4 @@ if(${BUILD_TESTING})
 endif()
 
 # Package configuration
-configure_package(NAMESPACE ${PROJECT_NAME} TARGETS ${PROJECT_NAME})
+configure_package(NAMESPACE ${PROJECT_NAME} DEPENDENCIES "Boost REQUIRED COMPONENTS filesystem" TARGETS ${PROJECT_NAME})
