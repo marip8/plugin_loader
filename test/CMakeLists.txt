@@ -15,15 +15,7 @@ target_clang_tidy(${PROJECT_NAME}_plugin_impl ENABLE ${ENABLE_CLANG_TIDY})
 # Unit test
 add_executable(${PROJECT_NAME}_utest utest.cpp)
 target_link_libraries(${PROJECT_NAME}_utest PRIVATE ${PROJECT_NAME}_plugin GTest::GTest GTest::Main)
+target_compile_definitions(${PROJECT_NAME}_utest PRIVATE PLUGIN_DIR="${CMAKE_CURRENT_BINARY_DIR}"
+                                                         PLUGINS="${PROJECT_NAME}_plugin_impl")
 add_gtest_discover_tests(${PROJECT_NAME}_utest)
 add_dependencies(run_tests ${PROJECT_NAME}_utest)
-target_compile_definitions(${PROJECT_NAME}_utest PRIVATE PLUGIN_DIR="${CMAKE_INSTALL_PREFIX}/lib"
-                                                         PLUGINS="${PROJECT_NAME}_plugin_impl")
-
-# Install the targets
-install(
-  TARGETS ${PROJECT_NAME}_plugin_impl ${PROJECT_NAME}_plugin ${PROJECT_NAME}_utest
-  EXPORT ${PROJECT_NAME}-targets
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
