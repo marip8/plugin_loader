@@ -22,7 +22,7 @@ target_clang_tidy(${PROJECT_NAME} ENABLE ${ENABLE_CLANG_TIDY})
 install(DIRECTORY include/${PROJECT_NAME}/ DESTINATION include/${PROJECT_NAME})
 
 # Unit tests
-if(${BUILD_TESTING})
+if(BUILD_TESTING)
   enable_testing()
   add_run_tests_target(ENABLE ${ENABLE_RUN_TESTING})
   add_subdirectory(test)

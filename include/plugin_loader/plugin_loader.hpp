@@ -141,8 +141,12 @@ static boost::shared_ptr<PluginBase> s_createSharedInstance(const std::string& s
     throw PluginLoaderException("Failed to find symbol '" + symbol_name +
                                 "' in library: " + decorate(library_name, library_directory));
 
-  // Load the class
+    // Load the class
+#if BOOST_VERSION >= 107600
+  return boost::dll::import_symbol<PluginBase>(lib, symbol_name);
+#else
   return boost::dll::import<PluginBase>(lib, symbol_name);
+#endif
 }
 
 template <typename PluginBase>
