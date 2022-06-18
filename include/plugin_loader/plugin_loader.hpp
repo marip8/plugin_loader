@@ -147,8 +147,9 @@ inline std::vector<std::string> getAllAvailableClasses(const std::string& sectio
   return inf.symbols(section);
 }
 
-inline std::vector<std::string> getAvailableSections(const std::string& library_name,
-                                                     const std::string& library_directory, bool include_hidden = false)
+inline std::vector<std::string> getAllAvailableSections(const std::string& library_name,
+                                                        const std::string& library_directory,
+                                                        bool include_hidden = false)
 {
   boost::dll::shared_library lib = loadLibrary(library_name, library_directory);
 
@@ -265,6 +266,11 @@ std::shared_ptr<PluginBase> PluginLoader::createInstance(const std::string& plug
 template <typename PluginBase>
 std::vector<std::string> PluginLoader::getAllAvailablePlugins() const
 {
+  return getAvailablePlugins(PluginBase::section);
+}
+
+std::vector<std::string> PluginLoader::getAvailablePlugins(const std::string& section) const
+{
   // Check for environment variable for plugin definitions
   std::set<std::string> library_names = getAllLibraryNames(search_libraries_env, search_libraries);
   if (library_names.empty())
@@ -291,7 +297,7 @@ std::vector<std::string> PluginLoader::getAllAvailablePlugins() const
         boost::dll::library_info inf(lib.location());
 
         // Getting symbols exported from plugin section
-        std::vector<std::string> exports = inf.symbols(PluginBase::section);
+        std::vector<std::string> exports = inf.symbols(section);
         plugins.insert(plugins.end(), exports.begin(), exports.end());
       }
       catch (const std::exception&)
@@ -302,6 +308,34 @@ std::vector<std::string> PluginLoader::getAllAvailablePlugins() const
   }
 
   return plugins;
+}
+
+std::vector<std::string> PluginLoader::getAvailableSections(bool include_hidden) const
+{
+  std::vector<std::string> sections;
+
+  // Check for environment variable for plugin definitions
+  std::set<std::string> library_names = getAllLibraryNames(search_libraries_env, search_libraries);
+  if (library_names.empty())
+    throw PluginLoaderException("No plugin libraries were provided!");
+
+  // Check for environment variable to override default library
+  std::set<std::string> search_paths_local = getAllSearchPaths(search_paths_env, search_paths);
+  for (const auto& path : search_paths_local)
+  {
+    for (const auto& library : library_names)
+    {
+      std::vector<std::string> lib_sections = getAllAvailableSections(library, path, include_hidden);
+      sections.insert(sections.end(), lib_sections.begin(), lib_sections.end());
+    }
+  }
+
+  return sections;
+}
+
+int PluginLoader::count() const
+{
+  return static_cast<int>(getAllLibraryNames(search_libraries_env, search_libraries).size());
 }
 
 }  // namespace plugin_loader

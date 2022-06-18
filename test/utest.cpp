@@ -36,6 +36,7 @@ class PluginLoaderFixture : public testing::Test
 public:
   PluginLoaderFixture()
   {
+    loader.search_paths.insert("/tmp/does_not_exist");
     loader.search_paths.insert(PLUGIN_DIR);
     loader.search_libraries.insert(PLUGINS);
   }
@@ -65,12 +66,12 @@ TEST(PluginLoader, supportMethods)  // NOLINT
   const std::string symbol_name = "ConsolePrinter";
 
   {
-    std::vector<std::string> sections = getAvailableSections(lib_name, lib_dir);
+    std::vector<std::string> sections = getAllAvailableSections(lib_name, lib_dir);
     EXPECT_EQ(sections.size(), 2);
     EXPECT_TRUE(std::find(sections.begin(), sections.end(), "printer") != sections.end());
     EXPECT_TRUE(std::find(sections.begin(), sections.end(), "shape") != sections.end());
 
-    sections = getAvailableSections(lib_name, lib_dir, true);
+    sections = getAllAvailableSections(lib_name, lib_dir, true);
     EXPECT_TRUE(sections.size() > 2);
   }
 

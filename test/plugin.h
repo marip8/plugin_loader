@@ -31,7 +31,7 @@ public:
   using Ptr = std::shared_ptr<Printer>;
   virtual void operator()() const = 0;
 
-private:
+protected:
   friend class PluginLoader;
   static const std::string section;
 };
@@ -45,11 +45,10 @@ public:
   using Ptr = std::shared_ptr<Shape>;
   virtual void operator()() const = 0;
 
-private:
+protected:
   friend class PluginLoader;
   static const std::string section;
 };
-
 
 struct ConsolePrinter : public Printer
 {
