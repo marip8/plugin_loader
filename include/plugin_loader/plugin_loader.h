@@ -58,12 +58,12 @@ public:
    */
   inline bool isPluginAvailable(const std::string& plugin_name) const;
 
-  /**
-   * @brief Get the available plugins under the provided section
-   * @param section The section name to get all available plugins
-   * @return A list of available plugins under the provided section
-   */
-  inline std::vector<std::string> getAllAvailablePlugins(const std::string& section) const;
+//  /**
+//   * @brief Get the available plugins under the provided section
+//   * @param section The section name to get all available plugins
+//   * @return A list of available plugins under the provided section
+//   */
+//  inline std::vector<std::string> getAllAvailablePlugins(const std::string& section) const;
 
   /**
    * @brief Get the available sections within the provided search libraries
