@@ -45,20 +45,6 @@ inline std::string decorate(const std::string& library_name, const std::string& 
   return actual_path.string();
 }
 
-inline std::vector<std::string> getAllAvailableClasses(const std::vector<boost::dll::fs::path>& libraries,
-                                                       const std::string& section)
-{
-  std::vector<std::string> classes;
-  for (const auto& library : libraries)
-  {
-    boost::dll::library_info inf(library);
-    std::vector<std::string> exports = inf.symbols(section);
-    classes.insert(classes.end(), exports.begin(), exports.end());
-  }
-
-  return classes;
-}
-
 inline std::set<std::string> parseEnvironmentVariableList(const std::string& env_variable)
 {
   std::set<std::string> list;
@@ -135,7 +121,21 @@ inline bool isClassAvailable(const std::string& symbol_name, const std::string& 
   return lib.has(symbol_name);
 }
 
-inline std::vector<std::string> getAvailableSymbols(const std::string& section, const std::string& library_name,
+inline std::vector<std::string> getAllAvailableClasses(const std::string& section,
+                                                       const std::vector<boost::dll::fs::path>& libraries)
+{
+  std::vector<std::string> classes;
+  for (const auto& library : libraries)
+  {
+    boost::dll::library_info inf(library);
+    std::vector<std::string> exports = inf.symbols(section);
+    classes.insert(classes.end(), exports.begin(), exports.end());
+  }
+
+  return classes;
+}
+
+inline std::vector<std::string> getAllAvailableClasses(const std::string& section, const std::string& library_name,
                                                     const std::string& library_directory = "")
 {
   boost::dll::shared_library lib = loadLibrary(library_name, library_directory);

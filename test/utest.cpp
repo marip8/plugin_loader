@@ -63,6 +63,7 @@ TEST(PluginLoader, supportMethods)  // NOLINT
   const std::string lib_name = std::string(PLUGINS);
   const std::string lib_dir = std::string(PLUGIN_DIR);
   const std::string symbol_name = "ConsolePrinter";
+
   {
     std::vector<std::string> sections = getAvailableSections(lib_name, lib_dir);
     EXPECT_EQ(sections.size(), 2);
@@ -74,14 +75,22 @@ TEST(PluginLoader, supportMethods)  // NOLINT
   }
 
   {
-    std::vector<std::string> symbols = getAvailableSymbols("printer", lib_name, lib_dir);
+    std::vector<boost::filesystem::path> sl = {boost::filesystem::path(decorate(lib_name, lib_dir))};
+    std::vector<std::string> symbols = getAllAvailableClasses("printer", sl);
     EXPECT_EQ(symbols.size(), 2);
     EXPECT_TRUE(std::find(symbols.begin(), symbols.end(), "ConsolePrinter") != symbols.end());
     EXPECT_TRUE(std::find(symbols.begin(), symbols.end(), "HelloWorldPrinter") != symbols.end());
   }
 
   {
-    std::vector<std::string> symbols = getAvailableSymbols("shape", lib_name, lib_dir);
+    std::vector<std::string> symbols = getAllAvailableClasses("printer", lib_name, lib_dir);
+    EXPECT_EQ(symbols.size(), 2);
+    EXPECT_TRUE(std::find(symbols.begin(), symbols.end(), "ConsolePrinter") != symbols.end());
+    EXPECT_TRUE(std::find(symbols.begin(), symbols.end(), "HelloWorldPrinter") != symbols.end());
+  }
+
+  {
+    std::vector<std::string> symbols = getAllAvailableClasses("shape", lib_name, lib_dir);
     EXPECT_EQ(symbols.size(), 2);
     EXPECT_TRUE(std::find(symbols.begin(), symbols.end(), "Square") != symbols.end());
     EXPECT_TRUE(std::find(symbols.begin(), symbols.end(), "Triangle") != symbols.end());
