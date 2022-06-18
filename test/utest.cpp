@@ -17,6 +17,7 @@
  */
 #include "plugin.h"
 #include <plugin_loader/plugin_loader.h>
+#include <plugin_loader/plugin_loader.hpp>
 #include <gtest/gtest.h>
 
 using namespace plugin_loader;
@@ -56,6 +57,86 @@ TYPED_TEST(PluginLoaderFixture, LoadPlugins)
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-goto)
   ASSERT_THROW(this->loader.template createInstance<TypeParam>(""), plugin_loader::PluginLoaderException);
+}
+
+TEST(PluginLoader, supportMethods)  // NOLINT
+{
+  std::set<std::string> s = parseEnvironmentVariableList("UNITTESTENV");
+  EXPECT_TRUE(s.empty());
+
+  std::string env_var = "UNITTESTENV=a:b:c";
+  putenv(env_var.data());
+  s = parseEnvironmentVariableList("UNITTESTENV");
+  std::vector<std::string> v(s.begin(), s.end());
+  EXPECT_EQ(v[0], "a");
+  EXPECT_EQ(v[1], "b");
+  EXPECT_EQ(v[2], "c");
+
+  const std::string lib_name = std::string(PLUGINS);
+  const std::string lib_dir = std::string(PLUGIN_DIR);
+  const std::string symbol_name = "ConsolePrinter";
+
+  {
+    std::vector<std::string> sections = getAllAvailableSections(lib_name, lib_dir);
+    EXPECT_EQ(sections.size(), 2);
+    EXPECT_TRUE(std::find(sections.begin(), sections.end(), "printer") != sections.end());
+    EXPECT_TRUE(std::find(sections.begin(), sections.end(), "shape") != sections.end());
+
+    sections = getAllAvailableSections(lib_name, lib_dir, true);
+    EXPECT_TRUE(sections.size() > 2);
+  }
+
+  {
+    std::vector<boost::filesystem::path> sl = {boost::filesystem::path(decorate(lib_name, lib_dir))};
+    std::vector<std::string> symbols = getAllAvailableClasses("printer", sl);
+    EXPECT_EQ(symbols.size(), 2);
+    EXPECT_TRUE(std::find(symbols.begin(), symbols.end(), "ConsolePrinter") != symbols.end());
+    EXPECT_TRUE(std::find(symbols.begin(), symbols.end(), "HelloWorldPrinter") != symbols.end());
+  }
+
+  {
+    std::vector<std::string> symbols = getAllAvailableClasses("printer", lib_name, lib_dir);
+    EXPECT_EQ(symbols.size(), 2);
+    EXPECT_TRUE(std::find(symbols.begin(), symbols.end(), "ConsolePrinter") != symbols.end());
+    EXPECT_TRUE(std::find(symbols.begin(), symbols.end(), "HelloWorldPrinter") != symbols.end());
+  }
+
+  {
+    std::vector<std::string> symbols = getAllAvailableClasses("shape", lib_name, lib_dir);
+    EXPECT_EQ(symbols.size(), 2);
+    EXPECT_TRUE(std::find(symbols.begin(), symbols.end(), "Square") != symbols.end());
+    EXPECT_TRUE(std::find(symbols.begin(), symbols.end(), "Triangle") != symbols.end());
+  }
+
+  {
+    EXPECT_TRUE(isClassAvailable("ConsolePrinter", lib_name, lib_dir));
+    EXPECT_FALSE(isClassAvailable("does_not_exist", lib_name, lib_dir));
+    EXPECT_FALSE(isClassAvailable("does_not_exist", lib_name));
+    // NOLINTNEXTLINE
+    ASSERT_THROW(isClassAvailable(symbol_name, lib_name, "does_not_exist"), plugin_loader::PluginLoaderException);
+    // NOLINTNEXTLINE
+    ASSERT_THROW(isClassAvailable(symbol_name, "does_not_exist", lib_dir), plugin_loader::PluginLoaderException);
+    // NOLINTNEXTLINE
+    ASSERT_THROW(isClassAvailable(symbol_name, "does_not_exist"), plugin_loader::PluginLoaderException);
+  }
+
+//  {
+//    // NOLINTNEXTLINE
+//    ASSERT_THROW(s_createSharedInstance<ConsolePrinter>(symbol_name, lib_name, "does_not_exist"),
+//                 plugin_loader::PluginLoaderException);
+//    // NOLINTNEXTLINE
+//    ASSERT_THROW(s_createSharedInstance<ConsolePrinter>(symbol_name, "does_not_exist", lib_dir),
+//                 plugin_loader::PluginLoaderException);
+//    // NOLINTNEXTLINE
+//    ASSERT_THROW(s_createSharedInstance<ConsolePrinter>("does_not_exist", lib_name, lib_dir),
+//                 plugin_loader::PluginLoaderException);
+//    // NOLINTNEXTLINE
+//    ASSERT_THROW(s_createSharedInstance<ConsolePrinter>(symbol_name, "does_not_exist"),
+//                 plugin_loader::PluginLoaderException);
+//    // NOLINTNEXTLINE
+//    ASSERT_THROW(s_createSharedInstance<ConsolePrinter>("does_not_exist", lib_name),
+//                 plugin_loader::PluginLoaderException);
+//  }
 }
 
 int main(int argc, char** argv)
