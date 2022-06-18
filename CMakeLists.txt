@@ -7,7 +7,7 @@ project(${pkg_extracted_name} VERSION ${pkg_extracted_version} LANGUAGES CXX)
 
 find_package(Boost REQUIRED COMPONENTS filesystem)
 
-option(ENABLE_CLANG_TIDY "Enables compilation with clang-tidy" OFF)
+option(ENABLE_CLANG_TIDY "Enables compilation with clang-tidy" ON)
 option(ENABLE_CODE_COVERAGE "Enables compilation with code coverage" ON)
 option(BUILD_TESTING "Enables compilation of unit tests" ON)
 option(ENABLE_RUN_TESTING "Enables running of unit tests as a part of the build" OFF)
