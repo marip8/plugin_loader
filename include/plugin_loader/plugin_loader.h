@@ -51,12 +51,12 @@ public:
   template <typename PluginBase>
   std::vector<std::string> getAllAvailablePlugins() const;
 
-  /**
-   * @brief Check if plugin is available
-   * @param plugin_name The plugin name to find
-   * @return True if plugin is found
-   */
-  inline bool isPluginAvailable(const std::string& plugin_name) const;
+//  /**
+//   * @brief Check if plugin is available
+//   * @param plugin_name The plugin name to find
+//   * @return True if plugin is found
+//   */
+//  inline bool isPluginAvailable(const std::string& plugin_name) const;
 
 //  /**
 //   * @brief Get the available plugins under the provided section
@@ -65,17 +65,17 @@ public:
 //   */
 //  inline std::vector<std::string> getAllAvailablePlugins(const std::string& section) const;
 
-  /**
-   * @brief Get the available sections within the provided search libraries
-   * @return A list of available sections
-   */
-  inline std::vector<std::string> getAvailableSections(bool include_hidden = false) const;
+//  /**
+//   * @brief Get the available sections within the provided search libraries
+//   * @return A list of available sections
+//   */
+//  inline std::vector<std::string> getAvailableSections(bool include_hidden = false) const;
 
-  /**
-   * @brief The number of plugins stored. The size of plugins variable
-   * @return The number of plugins.
-   */
-  inline int count() const;
+//  /**
+//   * @brief The number of plugins stored. The size of plugins variable
+//   * @return The number of plugins.
+//   */
+//  inline int count() const;
 
   /** @brief Indicate is system folders may be search if plugin is not found in any of the paths */
   bool search_system_folders{ true };

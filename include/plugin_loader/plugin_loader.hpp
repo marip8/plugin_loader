@@ -266,7 +266,6 @@ std::shared_ptr<PluginBase> PluginLoader::createInstance(const std::string& plug
 template <typename PluginBase>
 std::vector<std::string> PluginLoader::getAllAvailablePlugins() const
 {
-
   // Check for environment variable for plugin definitions
   std::set<std::string> library_names = getAllLibraryNames(search_libraries_env, search_libraries);
   if (library_names.empty())
@@ -306,32 +305,32 @@ std::vector<std::string> PluginLoader::getAllAvailablePlugins() const
   return plugins;
 }
 
-std::vector<std::string> PluginLoader::getAvailableSections(bool include_hidden) const
-{
-  std::vector<std::string> sections;
+//std::vector<std::string> PluginLoader::getAvailableSections(bool include_hidden) const
+//{
+//  std::vector<std::string> sections;
 
-  // Check for environment variable for plugin definitions
-  std::set<std::string> library_names = getAllLibraryNames(search_libraries_env, search_libraries);
-  if (library_names.empty())
-    throw PluginLoaderException("No plugin libraries were provided!");
+//  // Check for environment variable for plugin definitions
+//  std::set<std::string> library_names = getAllLibraryNames(search_libraries_env, search_libraries);
+//  if (library_names.empty())
+//    throw PluginLoaderException("No plugin libraries were provided!");
 
-  // Check for environment variable to override default library
-  std::set<std::string> search_paths_local = getAllSearchPaths(search_paths_env, search_paths);
-  for (const auto& path : search_paths_local)
-  {
-    for (const auto& library : library_names)
-    {
-      std::vector<std::string> lib_sections = getAllAvailableSections(library, path, include_hidden);
-      sections.insert(sections.end(), lib_sections.begin(), lib_sections.end());
-    }
-  }
+//  // Check for environment variable to override default library
+//  std::set<std::string> search_paths_local = getAllSearchPaths(search_paths_env, search_paths);
+//  for (const auto& path : search_paths_local)
+//  {
+//    for (const auto& library : library_names)
+//    {
+//      std::vector<std::string> lib_sections = getAllAvailableSections(library, path, include_hidden);
+//      sections.insert(sections.end(), lib_sections.begin(), lib_sections.end());
+//    }
+//  }
 
-  return sections;
-}
+//  return sections;
+//}
 
-int PluginLoader::count() const
-{
-  return static_cast<int>(getAllLibraryNames(search_libraries_env, search_libraries).size());
-}
+//int PluginLoader::count() const
+//{
+//  return static_cast<int>(getAllLibraryNames(search_libraries_env, search_libraries).size());
+//}
 
 }  // namespace plugin_loader
