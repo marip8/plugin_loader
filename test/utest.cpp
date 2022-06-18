@@ -38,25 +38,25 @@ using Implementations = ::testing::Types<Printer, Shape>;
 
 TYPED_TEST_SUITE(PluginLoaderFixture, Implementations);
 
-TYPED_TEST(PluginLoaderFixture, LoadPlugins)
-{
-  std::vector<std::string> plugins;
-  // NOLINTNEXTLINE(cppcoreguidelines-avoid-goto)
-  ASSERT_NO_THROW(plugins = this->loader.template getAllAvailablePlugins<TypeParam>());
-  ASSERT_EQ(plugins.size(), 2);
+//TYPED_TEST(PluginLoaderFixture, LoadPlugins)
+//{
+//  std::vector<std::string> plugins;
+//  // NOLINTNEXTLINE(cppcoreguidelines-avoid-goto)
+//  ASSERT_NO_THROW(plugins = this->loader.template getAllAvailablePlugins<TypeParam>());
+//  ASSERT_EQ(plugins.size(), 2);
 
-  for (const std::string& plugin_name : plugins)
-  {
-    std::cout << "Loading plugin '" << plugin_name << "'" << std::endl;
-    typename TypeParam::Ptr plugin;
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-goto)
-    ASSERT_NO_THROW(plugin = this->loader.template createInstance<TypeParam>(plugin_name));
-    ASSERT_NO_THROW(plugin->operator()());  // NOLINT(cppcoreguidelines-avoid-goto)
-  }
+//  for (const std::string& plugin_name : plugins)
+//  {
+//    std::cout << "Loading plugin '" << plugin_name << "'" << std::endl;
+//    typename TypeParam::Ptr plugin;
+//    // NOLINTNEXTLINE(cppcoreguidelines-avoid-goto)
+//    ASSERT_NO_THROW(plugin = this->loader.template createInstance<TypeParam>(plugin_name));
+//    ASSERT_NO_THROW(plugin->operator()());  // NOLINT(cppcoreguidelines-avoid-goto)
+//  }
 
-  // NOLINTNEXTLINE(cppcoreguidelines-avoid-goto)
-  ASSERT_THROW(this->loader.template createInstance<TypeParam>(""), plugin_loader::PluginLoaderException);
-}
+//  // NOLINTNEXTLINE(cppcoreguidelines-avoid-goto)
+//  ASSERT_THROW(this->loader.template createInstance<TypeParam>(""), plugin_loader::PluginLoaderException);
+//}
 
 TEST(PluginLoader, supportMethods)  // NOLINT
 {
