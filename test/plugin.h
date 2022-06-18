@@ -53,5 +53,7 @@ private:
 }  // namespace plugin_loader
 
 #include <plugin_loader/macros.h>
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 #define EXPORT_PRINTER_PLUGIN(DERIVED_CLASS, ALIAS) EXPORT_CLASS_SECTIONED(DERIVED_CLASS, ALIAS, printer)
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 #define EXPORT_SHAPE_PLUGIN(DERIVED_CLASS, ALIAS) EXPORT_CLASS_SECTIONED(DERIVED_CLASS, ALIAS, shape)

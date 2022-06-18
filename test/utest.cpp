@@ -36,11 +36,12 @@ public:
 
 using Implementations = ::testing::Types<Printer, Shape>;
 
-TYPED_TEST_CASE(PluginLoaderFixture, Implementations);
+TYPED_TEST_SUITE(PluginLoaderFixture, Implementations);
 
 TYPED_TEST(PluginLoaderFixture, LoadPlugins)
 {
   std::vector<std::string> plugins;
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-goto)
   ASSERT_NO_THROW(plugins = this->loader.template getAllAvailablePlugins<TypeParam>());
   ASSERT_EQ(plugins.size(), 2);
 
@@ -48,10 +49,12 @@ TYPED_TEST(PluginLoaderFixture, LoadPlugins)
   {
     std::cout << "Loading plugin '" << plugin_name << "'" << std::endl;
     typename TypeParam::Ptr plugin;
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-goto)
     ASSERT_NO_THROW(plugin = this->loader.template createInstance<TypeParam>(plugin_name));
-    ASSERT_NO_THROW(plugin->operator()());
+    ASSERT_NO_THROW(plugin->operator()());  // NOLINT(cppcoreguidelines-avoid-goto)
   }
 
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-goto)
   ASSERT_THROW(this->loader.template createInstance<TypeParam>(""), plugin_loader::PluginLoaderException);
 }
 

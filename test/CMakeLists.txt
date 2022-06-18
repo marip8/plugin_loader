@@ -17,5 +17,6 @@ add_executable(${PROJECT_NAME}_utest utest.cpp)
 target_link_libraries(${PROJECT_NAME}_utest PRIVATE ${PROJECT_NAME}_plugin GTest::GTest GTest::Main)
 target_compile_definitions(${PROJECT_NAME}_utest PRIVATE PLUGIN_DIR="${CMAKE_CURRENT_BINARY_DIR}"
                                                          PLUGINS="${PROJECT_NAME}_plugin_impl")
+target_clang_tidy(${PROJECT_NAME}_utest ENABLE ${ENABLE_CLANG_TIDY})
 add_gtest_discover_tests(${PROJECT_NAME}_utest)
 add_dependencies(run_tests ${PROJECT_NAME}_utest)

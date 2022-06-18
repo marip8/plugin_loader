@@ -27,7 +27,7 @@
 
 namespace
 {
-std::string decorate(const std::string& library_name, const std::string& library_directory = "")
+inline std::string decorate(const std::string& library_name, const std::string& library_directory = "")
 {
   boost::filesystem::path sl;
   if (library_directory.empty())
@@ -45,8 +45,8 @@ std::string decorate(const std::string& library_name, const std::string& library
   return actual_path.string();
 }
 
-std::vector<std::string> getAllAvailableClasses(const std::vector<boost::dll::fs::path>& libraries,
-                                                const std::string& section)
+inline std::vector<std::string> getAllAvailableClasses(const std::vector<boost::dll::fs::path>& libraries,
+                                                       const std::string& section)
 {
   std::vector<std::string> classes;
   for (const auto& library : libraries)
@@ -59,7 +59,7 @@ std::vector<std::string> getAllAvailableClasses(const std::vector<boost::dll::fs
   return classes;
 }
 
-std::set<std::string> parseEnvironmentVariableList(const std::string& env_variable)
+inline std::set<std::string> parseEnvironmentVariableList(const std::string& env_variable)
 {
   std::set<std::string> list;
   char* env_var = std::getenv(env_variable.c_str());
@@ -71,8 +71,8 @@ std::set<std::string> parseEnvironmentVariableList(const std::string& env_variab
   return list;
 }
 
-std::set<std::string> getAllSearchPaths(const std::string& search_paths_env,
-                                        const std::set<std::string>& existing_search_paths)
+inline std::set<std::string> getAllSearchPaths(const std::string& search_paths_env,
+                                               const std::set<std::string>& existing_search_paths)
 {
   // Check for environment variable to override default library
   if (!search_paths_env.empty())
@@ -85,8 +85,8 @@ std::set<std::string> getAllSearchPaths(const std::string& search_paths_env,
   return existing_search_paths;
 }
 
-std::set<std::string> getAllLibraryNames(const std::string& search_libraries_env,
-                                         const std::set<std::string>& existing_search_libraries)
+inline std::set<std::string> getAllLibraryNames(const std::string& search_libraries_env,
+                                                const std::set<std::string>& existing_search_libraries)
 {
   // Check for environment variable to override default library
   if (!search_libraries_env.empty())
@@ -99,7 +99,8 @@ std::set<std::string> getAllLibraryNames(const std::string& search_libraries_env
   return existing_search_libraries;
 }
 
-boost::dll::shared_library loadLibrary(const std::string& library_name, const std::string& library_directory = "")
+inline boost::dll::shared_library loadLibrary(const std::string& library_name,
+                                              const std::string& library_directory = "")
 {
   boost::system::error_code ec;
   boost::dll::shared_library lib;
@@ -227,14 +228,10 @@ std::vector<std::string> PluginLoader::getAllAvailablePlugins() const
   if (search_paths_local.empty())
   {
     if (!search_system_folders)
-    {
       throw PluginLoaderException("No plugin search paths were provided!");
-    }
-    else
-    {
-      // Insert an empty string into the search paths set to look in system folders
-      search_paths_local.insert(std::string{});
-    }
+
+    // Insert an empty string into the search paths set to look in system folders
+    search_paths_local.insert(std::string{});
   }
 
   std::vector<std::string> plugins;
