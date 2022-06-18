@@ -21,6 +21,7 @@
 #include <boost/dll/import.hpp>
 #include <boost/dll/alias.hpp>
 #include <boost/dll/import_class.hpp>
+#include <iostream>
 
 namespace plugin_loader
 {
@@ -43,7 +44,7 @@ public:
  * @param library_directory The library directory, if empty it just returns the decorated library name
  * @return The library name or path with prefix and suffix
  */
-inline std::string decorate(const std::string& library_name, const std::string& library_directory = "")
+static inline std::string decorate(const std::string& library_name, const std::string& library_directory = "")
 {
   boost::filesystem::path sl;
   if (library_directory.empty())
@@ -66,7 +67,7 @@ inline std::string decorate(const std::string& library_name, const std::string& 
  * @param env_variable The environment variable name to extract list from
  * @return A list extracted from variable name
  */
-inline std::set<std::string> parseEnvironmentVariableList(const std::string& env_variable)
+static inline std::set<std::string> parseEnvironmentVariableList(const std::string& env_variable)
 {
   std::set<std::string> list;
   char* env_var = std::getenv(env_variable.c_str());
@@ -84,7 +85,7 @@ inline std::set<std::string> parseEnvironmentVariableList(const std::string& env
  * @param existing_search_libraries A list of existing search paths
  * @return A list of search paths
  */
-inline std::set<std::string> getAllSearchPaths(const std::string& search_paths_env,
+static inline std::set<std::string> getAllSearchPaths(const std::string& search_paths_env,
                                                const std::set<std::string>& existing_search_paths)
 {
   // Check for environment variable to override default library
@@ -104,7 +105,7 @@ inline std::set<std::string> getAllSearchPaths(const std::string& search_paths_e
  * @param existing_search_libraries A list of existing library names without the prefix or suffix that contain plugins
  * @return A list of library names without the prefix or suffix that contain plugins
  */
-inline std::set<std::string> getAllLibraryNames(const std::string& search_libraries_env,
+static inline std::set<std::string> getAllLibraryNames(const std::string& search_libraries_env,
                                                 const std::set<std::string>& existing_search_libraries)
 {
   // Check for environment variable to override default library
@@ -124,7 +125,7 @@ inline std::set<std::string> getAllLibraryNames(const std::string& search_librar
  * @param library_directory The library directory, if empty it will enable search system directories
  * @return A shared library
  */
-inline boost::dll::shared_library loadLibrary(const std::string& library_name,
+static inline boost::dll::shared_library loadLibrary(const std::string& library_name,
                                               const std::string& library_directory = "")
 {
   boost::system::error_code ec;
@@ -159,7 +160,7 @@ inline boost::dll::shared_library loadLibrary(const std::string& library_name,
  * @param library_directory The library directory, if empty it will enable search system directories
  * @return True if the symbol exists, otherwise false
  */
-inline bool isClassAvailable(const std::string& symbol_name, const std::string& library_name,
+static inline bool isClassAvailable(const std::string& symbol_name, const std::string& library_name,
                              const std::string& library_directory = "")
 {
   boost::dll::shared_library lib = loadLibrary(library_name, library_directory);
@@ -172,7 +173,7 @@ inline bool isClassAvailable(const std::string& symbol_name, const std::string& 
  * @param libraries The library to search for symbols
  * @return A list of symbols if they exist.
  */
-inline std::vector<std::string> getAllAvailableClasses(const std::string& section,
+static inline std::vector<std::string> getAllAvailableClasses(const std::string& section,
                                                        const std::vector<boost::dll::fs::path>& libraries)
 {
   std::vector<std::string> classes;
@@ -193,7 +194,7 @@ inline std::vector<std::string> getAllAvailableClasses(const std::string& sectio
  * @param library_directory The library directory, if empty it will enable search system directories
  * @return A list of symbols if they exist.
  */
-inline std::vector<std::string> getAllAvailableClasses(const std::string& section, const std::string& library_name,
+static inline std::vector<std::string> getAllAvailableClasses(const std::string& section, const std::string& library_name,
                                                        const std::string& library_directory = "")
 {
   boost::dll::shared_library lib = loadLibrary(library_name, library_directory);
@@ -211,9 +212,9 @@ inline std::vector<std::string> getAllAvailableClasses(const std::string& sectio
  * @param library_directory The library directory, if empty it will enable search system directories
  * @return A list of sections if they exist.
  */
-inline std::vector<std::string> getAllAvailableSections(const std::string& library_name,
-                                                        const std::string& library_directory,
-                                                        bool include_hidden = false)
+static inline std::vector<std::string> getAllAvailableSections(const std::string& library_name,
+                                                               const std::string& library_directory,
+                                                               bool include_hidden = false)
 {
   boost::dll::shared_library lib = loadLibrary(library_name, library_directory);
 
