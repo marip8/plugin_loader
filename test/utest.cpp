@@ -17,7 +17,6 @@
  */
 #include "plugin.h"
 #include <plugin_loader/plugin_loader.h>
-#include <plugin_loader/plugin_loader.hpp>
 #include <gtest/gtest.h>
 
 using namespace plugin_loader;
@@ -87,7 +86,7 @@ TEST(PluginLoader, supportMethods)  // NOLINT
   }
 
   {
-    std::vector<boost::filesystem::path> sl = {boost::filesystem::path(decorate(lib_name, lib_dir))};
+    std::vector<boost::filesystem::path> sl = { boost::filesystem::path(decorate(lib_name, lib_dir)) };
     std::vector<std::string> symbols = getAllAvailableClasses("printer", sl);
     EXPECT_EQ(symbols.size(), 2);
     EXPECT_TRUE(std::find(symbols.begin(), symbols.end(), "ConsolePrinter") != symbols.end());
@@ -120,23 +119,23 @@ TEST(PluginLoader, supportMethods)  // NOLINT
     ASSERT_THROW(isClassAvailable(symbol_name, "does_not_exist"), plugin_loader::PluginLoaderException);
   }
 
-//  {
-//    // NOLINTNEXTLINE
-//    ASSERT_THROW(s_createSharedInstance<ConsolePrinter>(symbol_name, lib_name, "does_not_exist"),
-//                 plugin_loader::PluginLoaderException);
-//    // NOLINTNEXTLINE
-//    ASSERT_THROW(s_createSharedInstance<ConsolePrinter>(symbol_name, "does_not_exist", lib_dir),
-//                 plugin_loader::PluginLoaderException);
-//    // NOLINTNEXTLINE
-//    ASSERT_THROW(s_createSharedInstance<ConsolePrinter>("does_not_exist", lib_name, lib_dir),
-//                 plugin_loader::PluginLoaderException);
-//    // NOLINTNEXTLINE
-//    ASSERT_THROW(s_createSharedInstance<ConsolePrinter>(symbol_name, "does_not_exist"),
-//                 plugin_loader::PluginLoaderException);
-//    // NOLINTNEXTLINE
-//    ASSERT_THROW(s_createSharedInstance<ConsolePrinter>("does_not_exist", lib_name),
-//                 plugin_loader::PluginLoaderException);
-//  }
+  //  {
+  //    // NOLINTNEXTLINE
+  //    ASSERT_THROW(s_createSharedInstance<ConsolePrinter>(symbol_name, lib_name, "does_not_exist"),
+  //                 plugin_loader::PluginLoaderException);
+  //    // NOLINTNEXTLINE
+  //    ASSERT_THROW(s_createSharedInstance<ConsolePrinter>(symbol_name, "does_not_exist", lib_dir),
+  //                 plugin_loader::PluginLoaderException);
+  //    // NOLINTNEXTLINE
+  //    ASSERT_THROW(s_createSharedInstance<ConsolePrinter>("does_not_exist", lib_name, lib_dir),
+  //                 plugin_loader::PluginLoaderException);
+  //    // NOLINTNEXTLINE
+  //    ASSERT_THROW(s_createSharedInstance<ConsolePrinter>(symbol_name, "does_not_exist"),
+  //                 plugin_loader::PluginLoaderException);
+  //    // NOLINTNEXTLINE
+  //    ASSERT_THROW(s_createSharedInstance<ConsolePrinter>("does_not_exist", lib_name),
+  //                 plugin_loader::PluginLoaderException);
+  //  }
 }
 
 int main(int argc, char** argv)
