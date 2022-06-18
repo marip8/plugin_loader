@@ -50,6 +50,30 @@ private:
   static const std::string section;
 };
 
+
+struct ConsolePrinter : public Printer
+{
+public:
+  void operator()() const override;
+};
+
+struct HelloWorldPrinter : public Printer
+{
+public:
+  void operator()() const override;
+};
+
+struct Square : public Shape
+{
+public:
+  void operator()() const override;
+};
+
+struct Triangle : public Shape
+{
+public:
+  void operator()() const override;
+};
 }  // namespace plugin_loader
 
 #include <plugin_loader/macros.h>

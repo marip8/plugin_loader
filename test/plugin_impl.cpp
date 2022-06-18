@@ -21,41 +21,26 @@
 
 namespace plugin_loader
 {
-struct ConsolePrinter : public Printer
-{
-public:
-  void operator()() const override
-  {
-    std::cout << "IMPL: ConsolePrinter" << std::endl;
-  }
-};
 
-struct HelloWorldPrinter : public Printer
+void ConsolePrinter::operator()() const
 {
-public:
-  void operator()() const override
-  {
-    std::cout << "IMPL: Hello World" << std::endl;
-  }
-};
+  std::cout << "IMPL: ConsolePrinter" << std::endl;
+}
 
-struct Square : public Shape
+void HelloWorldPrinter::operator()() const
 {
-public:
-  void operator()() const override
-  {
-    std::cout << "IMPL: Square" << std::endl;
-  }
-};
+  std::cout << "IMPL: Hello World" << std::endl;
+}
 
-struct Triangle : public Shape
+void Square::operator()() const
 {
-public:
-  void operator()() const override
-  {
-    std::cout << "IMPL: Triangle" << std::endl;
-  }
-};
+  std::cout << "IMPL: Square" << std::endl;
+}
+
+void Triangle::operator()() const
+{
+  std::cout << "IMPL: Triangle" << std::endl;
+}
 
 }  // namespace plugin_loader
 
