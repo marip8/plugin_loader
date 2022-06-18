@@ -19,6 +19,7 @@
 
 #include <boost/config.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem/path.hpp>
 #include <boost/dll/import.hpp>
 #include <boost/dll/alias.hpp>
 #include <boost/dll/import_class.hpp>
