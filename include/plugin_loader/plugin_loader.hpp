@@ -15,117 +15,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <plugin_loader/plugin_loader.h>
+#pragma once
 
-#include <boost/algorithm/string.hpp>
 #include <boost/config.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/filesystem/path.hpp>
 #include <boost/dll/import.hpp>
 #include <boost/dll/alias.hpp>
 #include <boost/dll/import_class.hpp>
-#include <boost/dll/shared_library.hpp>
-#include <iostream>
 
-namespace
-{
-std::string decorate(const std::string& library_name, const std::string& library_directory = "")
-{
-  boost::filesystem::path sl;
-  if (library_directory.empty())
-    sl = boost::filesystem::path(library_name);
-  else
-    sl = boost::filesystem::path(library_directory) / library_name;
-
-  boost::filesystem::path actual_path =
-      (std::strncmp(sl.filename().string().c_str(), "lib", 3) != 0 ?
-           boost::filesystem::path((sl.has_parent_path() ? sl.parent_path() / L"lib" : L"lib").native() +
-                                   sl.filename().native()) :
-           sl);
-
-  actual_path += boost::dll::shared_library::suffix();
-  return actual_path.string();
-}
-
-std::vector<std::string> getAllAvailableClasses(const std::vector<boost::dll::fs::path>& libraries,
-                                                const std::string& section)
-{
-  std::vector<std::string> classes;
-  for (const auto& library : libraries)
-  {
-    boost::dll::library_info inf(library);
-    std::vector<std::string> exports = inf.symbols(section);
-    classes.insert(classes.end(), exports.begin(), exports.end());
-  }
-
-  return classes;
-}
-
-std::set<std::string> parseEnvironmentVariableList(const std::string& env_variable)
-{
-  std::set<std::string> list;
-  char* env_var = std::getenv(env_variable.c_str());
-  if (env_var == nullptr)  // Environment variable not found
-    return list;
-
-  std::string evn_str = std::string(env_var);
-  boost::split(list, evn_str, boost::is_any_of(":"), boost::token_compress_on);
-  return list;
-}
-
-std::set<std::string> getAllSearchPaths(const std::string& search_paths_env,
-                                        const std::set<std::string>& existing_search_paths)
-{
-  // Check for environment variable to override default library
-  if (!search_paths_env.empty())
-  {
-    std::set<std::string> search_paths = parseEnvironmentVariableList(search_paths_env);
-    search_paths.insert(existing_search_paths.begin(), existing_search_paths.end());
-    return search_paths;
-  }
-
-  return existing_search_paths;
-}
-
-std::set<std::string> getAllLibraryNames(const std::string& search_libraries_env,
-                                         const std::set<std::string>& existing_search_libraries)
-{
-  // Check for environment variable to override default library
-  if (!search_libraries_env.empty())
-  {
-    std::set<std::string> search_libraries = parseEnvironmentVariableList(search_libraries_env);
-    search_libraries.insert(existing_search_libraries.begin(), existing_search_libraries.end());
-    return search_libraries;
-  }
-
-  return existing_search_libraries;
-}
-
-boost::dll::shared_library loadLibrary(const std::string& library_name, const std::string& library_directory = "")
-{
-  boost::system::error_code ec;
-  boost::dll::shared_library lib;
-  if (library_directory.empty())
-  {
-    boost::filesystem::path sl(library_name);
-    boost::dll::load_mode::type mode =
-        boost::dll::load_mode::append_decorations | boost::dll::load_mode::search_system_folders;
-    lib = boost::dll::shared_library(sl, ec, mode);
-  }
-  else
-  {
-    boost::filesystem::path sl = boost::filesystem::path(library_directory) / library_name;
-    lib = boost::dll::shared_library(sl, ec, boost::dll::load_mode::append_decorations);
-  }
-
-  // Check if it failed to find or load library
-  if (ec)
-    throw plugin_loader::PluginLoaderException(
-        "Failed to find or load library: " + decorate(library_name, library_directory) +
-        " with error: " + ec.message());
-
-  return lib;
-}
-
-}  // namespace
+#include <plugin_loader/plugin_loader.h>
+#include <plugin_loader/plugin_loader_utils.h>
 
 namespace plugin_loader
 {
@@ -141,8 +41,12 @@ static boost::shared_ptr<PluginBase> s_createSharedInstance(const std::string& s
     throw PluginLoaderException("Failed to find symbol '" + symbol_name +
                                 "' in library: " + decorate(library_name, library_directory));
 
-  // Load the class
+    // Load the class
+#if BOOST_VERSION >= 107600
+  return boost::dll::import_symbol<PluginBase>(lib, symbol_name);
+#else
   return boost::dll::import<PluginBase>(lib, symbol_name);
+#endif
 }
 
 template <typename PluginBase>
@@ -223,14 +127,10 @@ std::vector<std::string> PluginLoader::getAllAvailablePlugins() const
   if (search_paths_local.empty())
   {
     if (!search_system_folders)
-    {
       throw PluginLoaderException("No plugin search paths were provided!");
-    }
-    else
-    {
-      // Insert an empty string into the search paths set to look in system folders
-      search_paths_local.insert(std::string{});
-    }
+
+    // Insert an empty string into the search paths set to look in system folders
+    search_paths_local.insert(std::string{});
   }
 
   std::vector<std::string> plugins;

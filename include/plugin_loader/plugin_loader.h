@@ -79,10 +79,6 @@ private:
   boost::shared_ptr<PluginBase> createInstanceBoost(const std::string& plugin_name) const;
 };
 
-class PluginLoaderException : public std::runtime_error
-{
-public:
-  using std::runtime_error::runtime_error;
-};
-
 }  // namespace plugin_loader
+
+#include <plugin_loader/plugin_loader.hpp>
