@@ -266,11 +266,7 @@ std::shared_ptr<PluginBase> PluginLoader::createInstance(const std::string& plug
 template <typename PluginBase>
 std::vector<std::string> PluginLoader::getAllAvailablePlugins() const
 {
-  return getAvailablePlugins(PluginBase::section);
-}
 
-std::vector<std::string> PluginLoader::getAvailablePlugins(const std::string& section) const
-{
   // Check for environment variable for plugin definitions
   std::set<std::string> library_names = getAllLibraryNames(search_libraries_env, search_libraries);
   if (library_names.empty())
@@ -297,7 +293,7 @@ std::vector<std::string> PluginLoader::getAvailablePlugins(const std::string& se
         boost::dll::library_info inf(lib.location());
 
         // Getting symbols exported from plugin section
-        std::vector<std::string> exports = inf.symbols(section);
+        std::vector<std::string> exports = inf.symbols(PluginBase::section);
         plugins.insert(plugins.end(), exports.begin(), exports.end());
       }
       catch (const std::exception&)
