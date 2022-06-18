@@ -31,7 +31,7 @@ public:
   using Ptr = std::shared_ptr<Printer>;
   virtual void operator()() const = 0;
 
-private:
+protected:
   friend class PluginLoader;
   static const std::string section;
 };
@@ -45,13 +45,38 @@ public:
   using Ptr = std::shared_ptr<Shape>;
   virtual void operator()() const = 0;
 
-private:
+protected:
   friend class PluginLoader;
   static const std::string section;
 };
 
+struct ConsolePrinter : public Printer
+{
+public:
+  void operator()() const override;
+};
+
+struct HelloWorldPrinter : public Printer
+{
+public:
+  void operator()() const override;
+};
+
+struct Square : public Shape
+{
+public:
+  void operator()() const override;
+};
+
+struct Triangle : public Shape
+{
+public:
+  void operator()() const override;
+};
 }  // namespace plugin_loader
 
 #include <plugin_loader/macros.h>
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 #define EXPORT_PRINTER_PLUGIN(DERIVED_CLASS, ALIAS) EXPORT_CLASS_SECTIONED(DERIVED_CLASS, ALIAS, printer)
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 #define EXPORT_SHAPE_PLUGIN(DERIVED_CLASS, ALIAS) EXPORT_CLASS_SECTIONED(DERIVED_CLASS, ALIAS, shape)

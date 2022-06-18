@@ -1,6 +1,18 @@
 # Plugin Loader
 Plugin loading library based on Boost DLL
 
+Platform             | CI Status
+---------------------|:---------
+Linux (Focal)        | [![Build Status](https://github.com/marip8/plugin_loader/actions/workflows/ubuntu_focal.yml/badge.svg)](https://github.com/marip8/plugin_loader/actions/workflows/ubuntu_focal.yml)
+Windows              | [![Build Status](https://github.com/tesseract-robotics/tesseract/workflows/Windows-Noetic-Build/badge.svg)](https://github.com/tesseract-robotics/tesseract/actions)
+Lint  (Clang-Format) | [![Build Status](https://github.com/marip8/plugin_loader/actions/workflows/clang_format.yml/badge.svg)](https://github.com/marip8/plugin_loader/actions/workflows/clang_format.yml)
+Lint  (CMake-Format) | [![Build Status](https://github.com/marip8/plugin_loader/actions/workflows/cmake_format.yml/badge.svg)](https://github.com/marip8/plugin_loader/actions/workflows/cmake_format.yml)
+Lint  (Clang-Tidy)   | [![Build Status](https://github.com/marip8/plugin_loader/actions/workflows/ubuntu_focal.yml/badge.svg)](https://github.com/marip8/plugin_loader/actions/workflows/ubuntu_focal.yml)
+
+[![Github Issues](https://img.shields.io/github/issues/marip8/plugin_loader.svg)](http://github.com/marip8/plugin_loader/issues)
+
+[![license - apache 2.0](https://img.shields.io/:license-Apache%202.0-yellowgreen.svg)](https://opensource.org/licenses/Apache-2.0)
+
 ## Usage
 The plugin loader must know the names of the libraries in which to search for plugins.
 These library names should not contain a prefix (i.e., lib/) or suffix (i.e., .so).

@@ -27,7 +27,7 @@
 
 namespace
 {
-std::string decorate(const std::string& library_name, const std::string& library_directory = "")
+inline std::string decorate(const std::string& library_name, const std::string& library_directory = "")
 {
   boost::filesystem::path sl;
   if (library_directory.empty())
@@ -45,21 +45,7 @@ std::string decorate(const std::string& library_name, const std::string& library
   return actual_path.string();
 }
 
-std::vector<std::string> getAllAvailableClasses(const std::vector<boost::dll::fs::path>& libraries,
-                                                const std::string& section)
-{
-  std::vector<std::string> classes;
-  for (const auto& library : libraries)
-  {
-    boost::dll::library_info inf(library);
-    std::vector<std::string> exports = inf.symbols(section);
-    classes.insert(classes.end(), exports.begin(), exports.end());
-  }
-
-  return classes;
-}
-
-std::set<std::string> parseEnvironmentVariableList(const std::string& env_variable)
+inline std::set<std::string> parseEnvironmentVariableList(const std::string& env_variable)
 {
   std::set<std::string> list;
   char* env_var = std::getenv(env_variable.c_str());
@@ -71,8 +57,8 @@ std::set<std::string> parseEnvironmentVariableList(const std::string& env_variab
   return list;
 }
 
-std::set<std::string> getAllSearchPaths(const std::string& search_paths_env,
-                                        const std::set<std::string>& existing_search_paths)
+inline std::set<std::string> getAllSearchPaths(const std::string& search_paths_env,
+                                               const std::set<std::string>& existing_search_paths)
 {
   // Check for environment variable to override default library
   if (!search_paths_env.empty())
@@ -85,8 +71,9 @@ std::set<std::string> getAllSearchPaths(const std::string& search_paths_env,
   return existing_search_paths;
 }
 
-std::set<std::string> getAllLibraryNames(const std::string& search_libraries_env,
-                                         const std::set<std::string>& existing_search_libraries)
+// aka tesseract_common::getAllSearchLibraries
+inline std::set<std::string> getAllLibraryNames(const std::string& search_libraries_env,
+                                                const std::set<std::string>& existing_search_libraries)
 {
   // Check for environment variable to override default library
   if (!search_libraries_env.empty())
@@ -99,7 +86,9 @@ std::set<std::string> getAllLibraryNames(const std::string& search_libraries_env
   return existing_search_libraries;
 }
 
-boost::dll::shared_library loadLibrary(const std::string& library_name, const std::string& library_directory = "")
+// aka tesseract_common::ClassLoader::isClassAvailable
+inline boost::dll::shared_library loadLibrary(const std::string& library_name,
+                                              const std::string& library_directory = "")
 {
   boost::system::error_code ec;
   boost::dll::shared_library lib;
@@ -125,6 +114,65 @@ boost::dll::shared_library loadLibrary(const std::string& library_name, const st
   return lib;
 }
 
+inline bool isClassAvailable(const std::string& symbol_name, const std::string& library_name,
+                             const std::string& library_directory = "")
+{
+  boost::dll::shared_library lib = loadLibrary(library_name, library_directory);
+  return lib.has(symbol_name);
+}
+
+inline std::vector<std::string> getAllAvailableClasses(const std::string& section,
+                                                       const std::vector<boost::dll::fs::path>& libraries)
+{
+  std::vector<std::string> classes;
+  for (const auto& library : libraries)
+  {
+    boost::dll::library_info inf(library);
+    std::vector<std::string> exports = inf.symbols(section);
+    classes.insert(classes.end(), exports.begin(), exports.end());
+  }
+
+  return classes;
+}
+
+inline std::vector<std::string> getAllAvailableClasses(const std::string& section, const std::string& library_name,
+                                                    const std::string& library_directory = "")
+{
+  boost::dll::shared_library lib = loadLibrary(library_name, library_directory);
+
+  // Class `library_info` can extract information from a library
+  boost::dll::library_info inf(lib.location());
+
+  // Getting symbols exported from he provided section
+  return inf.symbols(section);
+}
+
+inline std::vector<std::string> getAllAvailableSections(const std::string& library_name,
+                                                        const std::string& library_directory,
+                                                        bool include_hidden = false)
+{
+  boost::dll::shared_library lib = loadLibrary(library_name, library_directory);
+
+  // Class `library_info` can extract information from a library
+  boost::dll::library_info inf(lib.location());
+
+  // Getting section from library
+  std::vector<std::string> sections = inf.sections();
+
+  auto search_fn = [include_hidden](const std::string& section) {
+    if (section.empty())
+      return true;
+
+    if (include_hidden)
+      return false;
+
+    return (section.substr(0, 1) == ".");
+  };
+
+  sections.erase(std::remove_if(sections.begin(), sections.end(), search_fn), sections.end());
+  return sections;
+}
+
 }  // namespace
 
 namespace plugin_loader
@@ -141,8 +189,12 @@ static boost::shared_ptr<PluginBase> s_createSharedInstance(const std::string& s
     throw PluginLoaderException("Failed to find symbol '" + symbol_name +
                                 "' in library: " + decorate(library_name, library_directory));
 
-  // Load the class
+    // Load the class
+#if BOOST_VERSION >= 107600
+  return boost::dll::import_symbol<PluginBase>(lib, symbol_name);
+#else
   return boost::dll::import<PluginBase>(lib, symbol_name);
+#endif
 }
 
 template <typename PluginBase>
@@ -223,14 +275,10 @@ std::vector<std::string> PluginLoader::getAllAvailablePlugins() const
   if (search_paths_local.empty())
   {
     if (!search_system_folders)
-    {
       throw PluginLoaderException("No plugin search paths were provided!");
-    }
-    else
-    {
-      // Insert an empty string into the search paths set to look in system folders
-      search_paths_local.insert(std::string{});
-    }
+
+    // Insert an empty string into the search paths set to look in system folders
+    search_paths_local.insert(std::string{});
   }
 
   std::vector<std::string> plugins;
@@ -256,5 +304,33 @@ std::vector<std::string> PluginLoader::getAllAvailablePlugins() const
 
   return plugins;
 }
+
+//std::vector<std::string> PluginLoader::getAvailableSections(bool include_hidden) const
+//{
+//  std::vector<std::string> sections;
+
+//  // Check for environment variable for plugin definitions
+//  std::set<std::string> library_names = getAllLibraryNames(search_libraries_env, search_libraries);
+//  if (library_names.empty())
+//    throw PluginLoaderException("No plugin libraries were provided!");
+
+//  // Check for environment variable to override default library
+//  std::set<std::string> search_paths_local = getAllSearchPaths(search_paths_env, search_paths);
+//  for (const auto& path : search_paths_local)
+//  {
+//    for (const auto& library : library_names)
+//    {
+//      std::vector<std::string> lib_sections = getAllAvailableSections(library, path, include_hidden);
+//      sections.insert(sections.end(), lib_sections.begin(), lib_sections.end());
+//    }
+//  }
+
+//  return sections;
+//}
+
+//int PluginLoader::count() const
+//{
+//  return static_cast<int>(getAllLibraryNames(search_libraries_env, search_libraries).size());
+//}
 
 }  // namespace plugin_loader

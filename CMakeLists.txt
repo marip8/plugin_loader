@@ -8,8 +8,18 @@ project(${pkg_extracted_name} VERSION ${pkg_extracted_version} LANGUAGES CXX)
 find_package(Boost REQUIRED COMPONENTS filesystem)
 
 option(ENABLE_CLANG_TIDY "Enables compilation with clang-tidy" OFF)
+option(ENABLE_CODE_COVERAGE "Enables compilation with code coverage" OFF)
 option(BUILD_TESTING "Enables compilation of unit tests" OFF)
 option(ENABLE_RUN_TESTING "Enables running of unit tests as a part of the build" OFF)
+
+set(COVERAGE_EXCLUDE
+    /usr/*
+    /opt/*
+    ${CMAKE_CURRENT_LIST_DIR}/test/*
+    /*/gtest/*)
+
+initialize_code_coverage(ENABLE ${ENABLE_CODE_COVERAGE})
+add_code_coverage_all_targets(EXCLUDE ${COVERAGE_EXCLUDE} ENABLE ${ENABLE_CODE_COVERAGE})
 
 add_library(${PROJECT_NAME} INTERFACE)
 target_include_directories(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
@@ -22,7 +32,7 @@ target_clang_tidy(${PROJECT_NAME} ENABLE ${ENABLE_CLANG_TIDY})
 install(DIRECTORY include/${PROJECT_NAME}/ DESTINATION include/${PROJECT_NAME})
 
 # Unit tests
-if(${BUILD_TESTING})
+if(BUILD_TESTING)
   enable_testing()
   add_run_tests_target(ENABLE ${ENABLE_RUN_TESTING})
   add_subdirectory(test)
