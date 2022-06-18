@@ -126,6 +126,65 @@ inline boost::dll::shared_library loadLibrary(const std::string& library_name,
   return lib;
 }
 
+inline bool isClassAvailable(const std::string& symbol_name, const std::string& library_name,
+                             const std::string& library_directory = "")
+{
+  boost::dll::shared_library lib = loadLibrary(library_name, library_directory);
+  return lib.has(symbol_name);
+}
+
+inline std::vector<std::string> getAllAvailableClasses(const std::string& section,
+                                                       const std::vector<boost::dll::fs::path>& libraries)
+{
+  std::vector<std::string> classes;
+  for (const auto& library : libraries)
+  {
+    boost::dll::library_info inf(library);
+    std::vector<std::string> exports = inf.symbols(section);
+    classes.insert(classes.end(), exports.begin(), exports.end());
+  }
+
+  return classes;
+}
+
+inline std::vector<std::string> getAllAvailableClasses(const std::string& section, const std::string& library_name,
+                                                       const std::string& library_directory = "")
+{
+  boost::dll::shared_library lib = loadLibrary(library_name, library_directory);
+
+  // Class `library_info` can extract information from a library
+  boost::dll::library_info inf(lib.location());
+
+  // Getting symbols exported from he provided section
+  return inf.symbols(section);
+}
+
+inline std::vector<std::string> getAllAvailableSections(const std::string& library_name,
+                                                        const std::string& library_directory,
+                                                        bool include_hidden = false)
+{
+  boost::dll::shared_library lib = loadLibrary(library_name, library_directory);
+
+  // Class `library_info` can extract information from a library
+  boost::dll::library_info inf(lib.location());
+
+  // Getting section from library
+  std::vector<std::string> sections = inf.sections();
+
+  auto search_fn = [include_hidden](const std::string& section) {
+    if (section.empty())
+      return true;
+
+    if (include_hidden)
+      return false;
+
+    return (section.substr(0, 1) == ".");
+  };
+
+  sections.erase(std::remove_if(sections.begin(), sections.end(), search_fn), sections.end());
+  return sections;
+}
+
 }  // namespace
 
 namespace plugin_loader
