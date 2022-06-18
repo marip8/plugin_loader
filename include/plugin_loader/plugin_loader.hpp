@@ -85,6 +85,7 @@ std::set<std::string> getAllSearchPaths(const std::string& search_paths_env,
   return existing_search_paths;
 }
 
+// aka tesseract_common::getAllSearchLibraries
 std::set<std::string> getAllLibraryNames(const std::string& search_libraries_env,
                                          const std::set<std::string>& existing_search_libraries)
 {
@@ -99,6 +100,7 @@ std::set<std::string> getAllLibraryNames(const std::string& search_libraries_env
   return existing_search_libraries;
 }
 
+// aka tesseract_common::ClassLoader::isClassAvailable
 boost::dll::shared_library loadLibrary(const std::string& library_name, const std::string& library_directory = "")
 {
   boost::system::error_code ec;
@@ -123,6 +125,50 @@ boost::dll::shared_library loadLibrary(const std::string& library_name, const st
         " with error: " + ec.message());
 
   return lib;
+}
+
+bool isClassAvailable(const std::string& symbol_name, const std::string& library_name,
+                      const std::string& library_directory = "")
+{
+  boost::dll::shared_library lib = loadLibrary(library_name, library_directory);
+  return lib.has(symbol_name);
+}
+
+std::vector<std::string> getAvailableSymbols(const std::string& section, const std::string& library_name,
+                                             const std::string& library_directory = "")
+{
+  boost::dll::shared_library lib = loadLibrary(library_name, library_directory);
+
+  // Class `library_info` can extract information from a library
+  boost::dll::library_info inf(lib.location());
+
+  // Getting symbols exported from he provided section
+  return inf.symbols(section);
+}
+
+std::vector<std::string> getAvailableSections(const std::string& library_name, const std::string& library_directory,
+                                              bool include_hidden = false)
+{
+  boost::dll::shared_library lib = loadLibrary(library_name, library_directory);
+
+  // Class `library_info` can extract information from a library
+  boost::dll::library_info inf(lib.location());
+
+  // Getting section from library
+  std::vector<std::string> sections = inf.sections();
+
+  auto search_fn = [include_hidden](const std::string& section) {
+    if (section.empty())
+      return true;
+
+    if (include_hidden)
+      return false;
+
+    return (section.substr(0, 1) == ".");
+  };
+
+  sections.erase(std::remove_if(sections.begin(), sections.end(), search_fn), sections.end());
+  return sections;
 }
 
 }  // namespace
